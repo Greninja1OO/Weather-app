@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  String weather = 'rain';
+  String weather = 'open';
   var language = {
     'Afrikaans': 'af',
     'Albanian': 'al',
@@ -86,10 +86,13 @@ class _HomePageState extends State<HomePage> {
     'Zulu': 'zu'
   };
   String unit = 'metric';
-  String str = '11d';
-  String place = 'Bangalore';
+  String str = '';
+  String place = '';
   String lang = 'en';
-
+  bool update = true;
+  String up = 'Search';
+  String temperature = '';
+  bool degree = true;
   @override
   Widget build(BuildContext context) {
     switch (str) {
@@ -131,7 +134,7 @@ class _HomePageState extends State<HomePage> {
         break;
       case '03d':
       case '03n':
-        weather = 'night clouds';
+        weather = 'night cloud';
         break;
       case '04d':
 
@@ -139,7 +142,7 @@ class _HomePageState extends State<HomePage> {
         weather = "heavy clouds";
         break;
       default:
-        weather = "Invalid";
+        weather = "open";
         break;
     }
     return Scaffold(
@@ -151,6 +154,10 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             width: double.infinity,
             height: double.infinity,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/$weather.jpg"),
+                    fit: BoxFit.cover)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -161,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xff44000000),
                       child: Column(children: [
                         TextFormField(
+                          style: TextStyle(color: Colors.white70),
                           decoration: const InputDecoration(
                               icon: Icon(
                                 Icons.place,
@@ -168,11 +176,12 @@ class _HomePageState extends State<HomePage> {
                               ),
                               hintStyle: TextStyle(color: Colors.white54),
                               hintText: 'Search Location',
-                              labelText: 'Place',
+                              labelText: 'Place *',
                               labelStyle: TextStyle(color: Colors.white70)),
                           controller: myController,
                         ),
                         TextFormField(
+                          style: TextStyle(color: Colors.white70),
                           decoration: const InputDecoration(
                             icon: Icon(
                               Icons.language_sharp,
@@ -180,16 +189,17 @@ class _HomePageState extends State<HomePage> {
                             ),
                             hintStyle: TextStyle(color: Colors.white54),
                             hintText: 'Type the Language',
-                            labelText: 'Language',
+                            labelText: 'Language(Default:English)',
                             labelStyle: TextStyle(color: Colors.white70),
                           ),
                           controller: myController1,
                         ),
                       ])),
+                  Container(height: 30),
                   ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.green)),
+                            MaterialStateProperty.all(Color(0xff44000000))),
                     onPressed: (() {
                       place = myController.text;
                       myController.text =
@@ -206,34 +216,120 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: Colors.white, fontSize: 30),
                     ),
                   ),
+                  Container(height: 30),
                   FutureBuilder(
                       future: apicall(place, lang, unit),
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) {
+                        if (snapshot.hasData && update == true) {
                           str = snapshot.data['icon'];
-
+                          temperature =
+                              (snapshot.data['temp']).toStringAsFixed(2);
                           return Column(children: [
-                            Text(snapshot.data['description'].toString()),
-                            Text(place),
-                            Text((snapshot.data['temp']).toStringAsFixed(2)),
-                            Image.network(
-                                'http://openweathermap.org/img/wn/${str}@2x.png'),
-                            Text(
-                                (snapshot.data['temp_min']).toStringAsFixed(2)),
-                            Text(
-                                (snapshot.data['temp_max']).toStringAsFixed(2)),
+                            Container(
+                                width: 400,
+                                color: Color(0xff44000000),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "UTC+" +
+                                            (snapshot.data['time'] / 3600)
+                                                .floor()
+                                                .toStringAsFixed(0) +
+                                            ":" +
+                                            ((snapshot.data['time'] / 3600 -
+                                                        int.parse((snapshot
+                                                                        .data[
+                                                                    'time'] /
+                                                                3600)
+                                                            .floor()
+                                                            .toStringAsFixed(
+                                                                0))) *
+                                                    60)
+                                                .toStringAsFixed(0) +
+                                            "\n" +
+                                            place,
+                                        style: TextStyle(color: Colors.white),
+                                        textScaleFactor: 2,
+                                      ),
+                                      Text(
+                                        temperature + "°C",
+                                        textScaleFactor: 3,
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      Image.network(
+                                          'http://openweathermap.org/img/wn/${str}@2x.png'),
+                                    ])),
+                            Container(
+                                width: 400,
+                                color: Color(0xff44000000),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              ("Humidity : " +
+                                                  snapshot.data['humidity']
+                                                      .toStringAsFixed(2) +
+                                                  "%"),
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                              textScaleFactor: 1,
+                                            ),
+                                            Text(
+                                              ("Wind Speed : " +
+                                                  (snapshot.data['wind_speed'] *
+                                                          18 /
+                                                          5)
+                                                      .toStringAsFixed(2) +
+                                                  "km/hr"),
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                              textScaleFactor: 1,
+                                            ),
+                                          ]),
+                                      Container(
+                                        width: 175,
+                                      ),
+                                      Column(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_upward,
+                                            color: Colors.white,
+                                          ),
+                                          Icon(
+                                            Icons.arrow_downward,
+                                            color: Colors.white,
+                                          )
+                                        ],
+                                      ),
+                                      Column(children: [
+                                        Text(
+                                          '${(snapshot.data['temp_max']).toStringAsFixed(2)} °',
+                                          style: TextStyle(color: Colors.white),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          (snapshot.data['temp_min'])
+                                                  .toStringAsFixed(2) +
+                                              ' °',
+                                          style: TextStyle(color: Colors.white),
+                                          textScaleFactor: 1,
+                                        ),
+                                      ])
+                                    ]))
                           ]);
                         } else {
-                          return CircularProgressIndicator();
+                          return Container();
                         }
                       })
                 ]),
               ],
             ),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/$weather.jpg"),
-                    fit: BoxFit.cover)),
           ),
         ));
   }
@@ -251,7 +347,10 @@ Future apicall(String place, String lang, String unit) async {
     'temp': json['main']['temp'],
     'icon': json['weather'][0]['icon'],
     'temp_max': json['main']['temp_max'],
-    'temp_min': json['main']['temp_min']
+    'temp_min': json['main']['temp_min'],
+    'wind_speed': json['wind']['speed'],
+    'humidity': json['main']['humidity'],
+    "time": json["timezone"]
   };
   return output;
 }
