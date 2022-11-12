@@ -262,8 +262,18 @@ class _HomePageState extends State<HomePage> {
                                         textScaleFactor: 3,
                                         style: TextStyle(color: Colors.white),
                                       ),
-                                      Image.network(
-                                          'http://openweathermap.org/img/wn/${str}@2x.png'),
+                                      Column(
+                                        children: [
+                                          Image.network(
+                                              'http://openweathermap.org/img/wn/${str}@2x.png'),
+                                          Text(
+                                            snapshot.data['description'],
+                                            textScaleFactor: 1,
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ],
+                                      )
                                     ])),
                             Container(
                                 width: 400,
