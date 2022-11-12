@@ -266,15 +266,20 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Image.network(
                                               'http://openweathermap.org/img/wn/${str}@2x.png'),
-                                          Text(
-                                            snapshot.data['description'],
-                                            textScaleFactor: 1,
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
                                         ],
                                       )
                                     ])),
+                            Container(
+                                width: 400,
+                                color: Color(0xff44000000),
+                                child: Text(
+                                  snapshot.data['description'],
+                                  textScaleFactor: 1,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                )),
                             Container(
                                 width: 400,
                                 color: Color(0xff44000000),
