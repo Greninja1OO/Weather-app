@@ -208,11 +208,15 @@ class _HomePageState extends State<HomePage> {
                           myController1.text.capitalize.toString();
                       lang = language[myController1.text].toString();
                       place = place.capitalize.toString();
-
+                      update = !update;
+                      if (update == true)
+                        up = "Search";
+                      else
+                        up = "Click Again to Update";
                       setState(() {});
                     }),
-                    child: const Text(
-                      "Search",
+                    child: Text(
+                      "$up",
                       style: TextStyle(color: Colors.white, fontSize: 30),
                     ),
                   ),
@@ -220,8 +224,8 @@ class _HomePageState extends State<HomePage> {
                   FutureBuilder(
                       future: apicall(place, lang, unit),
                       builder: (context, snapshot) {
+                        if (snapshot.hasData) str = snapshot.data['icon'];
                         if (snapshot.hasData && update == true) {
-                          str = snapshot.data['icon'];
                           temperature =
                               (snapshot.data['temp']).toStringAsFixed(2);
                           return Column(children: [
